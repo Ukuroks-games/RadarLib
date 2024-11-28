@@ -1,0 +1,8 @@
+[package]
+name = "egor00f/radarlib"
+version = "0.1.0"
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+license = "MIT"
+
+

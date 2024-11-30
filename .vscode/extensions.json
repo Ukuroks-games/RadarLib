@@ -1,6 +1,7 @@
 {
     "recommendations": [
-        "nightrains.robloxlsp",
-        "evaera.vscode-rojo"
+        "evaera.vscode-rojo",
+        "johnnymorganz.stylua",
+        "johnnymorganz.luau-lsp"
     ]
 }

@@ -8,6 +8,13 @@
 			"Packages": {
 				"$path": "src"
 			}
+		},
+		"Workspace": {
+			"$className": "Workspace",
+			"$ignoreUnknownInstances": true,
+			"Examples": {
+				"$path": "examples"
+			}
 		}
 	}
 }

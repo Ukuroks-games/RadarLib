@@ -1,4 +1,6 @@
 {
+    "cSpell.enabled": true,
     "stylua.targetReleaseVersion": "latest",
-    "editor.defaultFormatter":"JohnnyMorganz.stylua"
+    "editor.defaultFormatter":"JohnnyMorganz.stylua",
+    "luau-lsp.sourcemap.rojoProjectFile": "RadarLib.project.json"
 }

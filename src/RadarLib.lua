@@ -2,12 +2,12 @@
 	# RadarLib
 
 	RadarLib - это библиотека для радаров.
-
 ]]
 local Radarlib = {}
 
 --[[
-	Структура данных получаемых с радара
+	# Структура данных получаемых с радара
+	
 	представляет собой двумерный массив из длин от радара до объекта
 ]]
 export type RadarData = {
@@ -17,21 +17,24 @@ export type RadarData = {
 }
 
 --[[
-	Структура данных радара
+	# Структура данных радара
+
 ]]
 export type Radar = {
 	--[[
-		Деталь отностиельно которой будет радар получать данные
+		# Парт отностиельно которой будет радар получать данные
+
+		Размер не важен, имеет значение только координаты и вращение
 	]]
 	RadarPart: Part,
 
 	--[[
-		Дистанция работы радара
+		# Дальность работы радара
 	]]
 	Distace: number,
 
 	--[[
-		Углы работы радара по X и Y
+		# Углы работы радара по X и Y
 	]]
 	Angles: {
 		X: number,
@@ -39,7 +42,7 @@ export type Radar = {
 	},
 
 	--[[
-		Разрешение радара по X и Y
+		# Разрешение радара по X и Y
 		Влияет на размер получаемых данных
 	]]
 	Resolution: {
@@ -49,30 +52,35 @@ export type Radar = {
 }
 
 --[[
-	Создать радар
+	# Создать радар
 
-	#### Params:
+	Создаёт радар. Использовать именно эту фнукцию не обязятельно, но лучше использовать т.к. есть проверки на правильность аргументов
+
+	## Params:
 
 	`radarPart` - Парт, который используется как
+
 	`resolution` - Разрешение радара, если значение X или Y равно -1, то использется то же, что и для углов
+
 	`angles` - Углы работы радара
 
-	#### Returns:
+	## Returns:
 
 	Созданная структура радара
 
-	#### Usage
+	## Usage
 
 	Example:
 
 	```
 	local ReplicatedStorage = game:GetService("ReplicatedStorage")
-	local RadarLib = require(ReplicatedStorage.shared.RadarLib)
+	local RadarLib = require(ReplicatedStorage.Packages.RadarLib)
 
 	local RadarPart = worspace.RadarPart
 
 	local radar = RadarLib.CreateRadar (
 		RararPart,
+		10,
 		{X=-1, X=-1},
 		{
 			X = 40
@@ -80,7 +88,6 @@ export type Radar = {
 		}
 	)
 	```
-
 ]]
 function Radarlib.CreateRadar(
 	radarPart: Part,
@@ -88,8 +95,8 @@ function Radarlib.CreateRadar(
 	resolution: { X: number, Y: number },
 	angles: { X: number, Y: number }
 ): Radar
-	if not (angles.X > 0 and angles.X > 0) then
-		error("Wrong angles:", angles)
+	if not (angles.X > 0 and angles.Y > 0) then
+		error("Wrong angles")
 	end
 
 	if resolution.X == -1 then
@@ -111,30 +118,51 @@ function Radarlib.CreateRadar(
 end
 
 --[[
-	Получить данные с радара
+	# Получить данные с радара
 
-	#### Params:
+	Осторожно! Эта функция может быть медленной.
+
+	## Params:
 
 	`radar` - Радар, с котромо получаем данные
 
-	#### Returns:
+	## Returns:
 
 	Данные с радара.
 ]]
 function Radarlib.GetData(radar: Radar): RadarData
 	local ret: RadarData = {}
 
-	for i = 1, radar.Resolution.Y do
+	local props = RaycastParams.new()
+
+	props.FilterDescendantsInstances = {
+		radar.RadarPart,
+	}
+
+	local startDirection = Vector3.new(
+		radar.RadarPart.CFrame.LookVector.X - (radar.Angles.X / 2),
+		radar.RadarPart.CFrame.LookVector.Y - (radar.Angles.Y / 2),
+		radar.RadarPart.CFrame.LookVector.Z
+	)
+
+	for i = 0, radar.Resolution.Y do
 		ret[i] = {}
-		for j = 1, radar.Resolution.X do
-			local pos = radar.RadarPart.Position
+		for j = 0, radar.Resolution.X do
 
-			local direction = radar.RadarPart.CFrame.LookVector * radar.Distace
-
-			local ray = workspace:Raycast(pos, direction)
+			local ray = workspace:Raycast(
+				radar.RadarPart.CFrame.Position,
+				Vector3.new(
+					startDirection.X + ((i / radar.Resolution.X) * radar.Angles.X),
+					startDirection.Y + ((i / radar.Resolution.Y) * radar.Angles.Y),
+					startDirection.Z
+				) * radar.Distace,
+				props
+			)
 
 			if ray then
 				ret[i][j] = ray.Distance
+			else
+				ret[i][j] = -1
 			end
 		end
 	end
